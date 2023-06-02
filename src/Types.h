@@ -48,6 +48,11 @@ enum TokenType
 	T_COMMENT,
 	T_END_OF_FILE,
 	T_ERROR,
+
+	//newest
+	T_REM,			//rem
+	T_SEQ,			//seq
+	T_BEQ,			//beq
 };
 
 
@@ -66,7 +71,11 @@ enum InstructionType
 	I_SW,
 	I_BLTZ,
 	I_B,
-	I_NOP
+	I_NOP,
+	//newest
+	I_REM,
+	I_SEQ,
+	I_BEQ,
 };
 
 /**

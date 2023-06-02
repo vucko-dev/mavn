@@ -1,7 +1,10 @@
 #include <iostream>
 #include <exception>
+#include <iomanip>
+
 
 #include "LexicalAnalysis.h"
+#include "SyntaxAnalysis.h"
 
 using namespace std;
 
@@ -31,6 +34,27 @@ int main()
 		{
 			lex.printLexError();
 			throw runtime_error("\nException! Lexical analysis failed!\n");
+		}
+
+		cout << setfill('-') << setw(LEFT_ALIGN + RIGHT_ALIGN + 1) << " " << endl;
+		cout << setfill(' ');
+		cout << "Starting syntax analysis . . ." << endl;
+		cout << setw(LEFT_ALIGN) << left << "Type:";
+		cout << setw(RIGHT_ALIGN) << right << "Value:" << endl;
+		cout << setfill('-') << setw(LEFT_ALIGN + RIGHT_ALIGN + 1) << " " << endl;
+		cout << setfill(' ');
+
+		SyntaxAnalysis syntaxAnalysis(lex);
+
+		retVal = syntaxAnalysis.doSyntaxAnalysis();
+
+		if (retVal)
+		{
+			cout << "Syntax analysis finished successfully!" << endl;
+		}
+		else
+		{
+			throw runtime_error("\nException! Syntax analysis failed!\n");
 		}
 	}
 	catch (runtime_error e)
