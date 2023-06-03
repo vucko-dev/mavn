@@ -78,14 +78,21 @@
   <ItemGroup>
     <ClInclude Include="Constants.h" />
     <ClInclude Include="FiniteStateMachine.h" />
-    <ClInclude Include="IR.h" />
+    <ClInclude Include="Instruction.h" />
+    <ClInclude Include="Label.h" />
     <ClInclude Include="LexicalAnalysis.h" />
+    <ClInclude Include="LivenessAnalysis.h" />
     <ClInclude Include="SyntaxAnalysis.h" />
     <ClInclude Include="Token.h" />
     <ClInclude Include="Types.h" />
+    <ClInclude Include="Variable.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FiniteStateMachine.cpp" />
+    <ClCompile Include="Instruction.cpp" />
+    <ClCompile Include="Label.cpp" />
+    <ClCompile Include="LivenessAnalysis.cpp" />
+    <ClCompile Include="Variable.cpp" />
     <ClCompile Include="LexicalAnalysis.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SyntaxAnalysis.cpp" />

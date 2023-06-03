@@ -2,9 +2,13 @@
 
 #include "LexicalAnalysis.h"
 #include "Token.h"
+#include "Variable.h"
+#include "Instruction.h"
+#include "Label.h"
 
 
-class SyntaxAnalysis {
+class SyntaxAnalysis 
+{
 
 private:
 
@@ -17,6 +21,18 @@ private:
 
 	//Current token for analyize
 	Token m_currentToken;
+
+	//List of all instructions
+	Instructions* m_instructions;
+
+	//List of memory variables
+	Variables* m_memVars;
+
+	//List of register variables
+	Variables* m_regVars;
+
+	//List of labels 
+	Labels m_labels;
 
 	//Nonterminal symbol Q
 	void q();
@@ -33,10 +49,14 @@ private:
 	//Syntax error indicator
 	bool m_syntaxError;
 
+	int m_instructionCounter;
+
+	int m_variableCounter;
+
 public:
 
 	//Constructor that recieves reference of the lexical analysis module which is go to be used for creating token iterator
-	SyntaxAnalysis(LexicalAnalysis &lexicalAnalysis);
+	SyntaxAnalysis(LexicalAnalysis& lexicalAnalysis, Instructions* instructions, Variables* memoryVariables, Variables* registerVariables);
 
 	//Method that performs syntax analysis; returns false if error found, otherwise true
 	bool doSyntaxAnalysis();
@@ -49,4 +69,22 @@ public:
 
 	//Returns the next token from the token list
 	Token getNextToken();
+
+	//Checks variable existance
+	bool variableExists(Variable* var);
+
+	//Add variable in variable list
+	void addVariable(Variable* var);
+
+	//Checks label existance
+	bool labelExists(Label* label);
+
+	//Add label in label list
+	void addLabel(Label* label);
+
+	//Returns a Variable if it is added before, else exepction
+	Variable* getVariable(std::string name);
+
+	//Returns a Label if it is added before, else exepction
+	Label* getLabel(std::string name);
 };

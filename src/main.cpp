@@ -5,15 +5,41 @@
 
 #include "LexicalAnalysis.h"
 #include "SyntaxAnalysis.h"
+#include "Instruction.h"
+#include "LivenessAnalysis.h"
 
 using namespace std;
 
+
+void printInstructions(Instructions &instructions) 
+{
+	for (Instruction* instruction : instructions)
+	{
+		cout << setfill('-') << setw(LEFT_ALIGN + RIGHT_ALIGN + 1) << " " << endl;
+		cout << (*instruction) << endl;
+		cout << setfill('-') << setw(LEFT_ALIGN + RIGHT_ALIGN + 1) << " " << endl;
+
+	}
+}
+
+void printVariables(Variables &variables) 
+{
+	for (Variable* variable : variables) 
+	{
+		cout << variable->getName() << " ";
+		if (variable->getType() == Variable::VariableType::MEM_VAR)
+		{
+			cout << variable->getValue();
+		}
+		cout << endl;
+	}
+}
 
 int main()
 {
 	try
 	{
-		std::string fileName = ".\\..\\examples\\simple.mavn";
+		std::string fileName = ".\\..\\examples\\multiply.mavn";
 		bool retVal = false;
 
 		LexicalAnalysis lex;
@@ -28,7 +54,7 @@ int main()
 		if (retVal)
 		{
 			cout << "Lexical analysis finished successfully!" << endl;
-			lex.printTokens();
+			//lex.printTokens();
 		}
 		else
 		{
@@ -44,8 +70,10 @@ int main()
 		cout << setfill('-') << setw(LEFT_ALIGN + RIGHT_ALIGN + 1) << " " << endl;
 		cout << setfill(' ');
 
-		SyntaxAnalysis syntaxAnalysis(lex);
-
+		Instructions instructions;
+		Variables memoryVariables, registerVariables;
+		SyntaxAnalysis syntaxAnalysis(lex, &instructions, &memoryVariables, &registerVariables);
+		
 		retVal = syntaxAnalysis.doSyntaxAnalysis();
 
 		if (retVal)
@@ -56,6 +84,13 @@ int main()
 		{
 			throw runtime_error("\nException! Syntax analysis failed!\n");
 		}
+
+		livenessAnalysis(&instructions);
+		printInstructions(instructions);
+		printVariables(memoryVariables);
+		printVariables(registerVariables);
+
+
 	}
 	catch (runtime_error e)
 	{

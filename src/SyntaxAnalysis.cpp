@@ -1,7 +1,8 @@
 #include "SyntaxAnalysis.h"
 #include <iostream>
+#include <algorithm>
 
-SyntaxAnalysis::SyntaxAnalysis(LexicalAnalysis& lexicalAnalysis) : m_lexicalAnalysis(lexicalAnalysis), m_syntaxError(false)
+SyntaxAnalysis::SyntaxAnalysis(LexicalAnalysis& lexicalAnalysis, Instructions* instructions, Variables* memoryVariables, Variables* registerVariables) : m_lexicalAnalysis(lexicalAnalysis), m_instructions(instructions), m_memVars(memoryVariables), m_regVars(registerVariables),  m_syntaxError(false), m_instructionCounter(0), m_variableCounter(0)
 {
 	m_tokenIterator = m_lexicalAnalysis.getTokenList().begin();
 }
@@ -26,7 +27,7 @@ void SyntaxAnalysis::eat(TokenType t)
 {
 	if (m_currentToken.getType() == t)
 	{
-		m_currentToken.printTokenInfo();
+		//m_currentToken.printTokenInfo();
 		if (m_currentToken.getType() == T_END_OF_FILE)
 		{
 			return;
@@ -81,16 +82,25 @@ void SyntaxAnalysis::s()
 		return;
 	}
 
+	Variable *var = NULL;
+	Instruction *instruction = NULL;
+
 	if (m_currentToken.getType() == T_MEM)
 	{
 		eat(T_MEM);
 
 		if (m_currentToken.getType() == T_M_ID)
 		{
+
+			std::string variableName = m_currentToken.getValue();
+
 			eat(T_M_ID);
 			
 			if (m_currentToken.getType() == T_NUM)
 			{
+				std::string variableValue = m_currentToken.getValue();
+				var = new Variable(variableName, Variable::MEM_VAR, stoi(variableValue));
+				addVariable(var);
 				eat(T_NUM);
 			}
 			else
@@ -112,6 +122,11 @@ void SyntaxAnalysis::s()
 
 		if (m_currentToken.getType() == T_R_ID)
 		{
+			std::string variableName = m_currentToken.getValue();
+			var = new Variable(variableName, Variable::REG_VAR);
+			//var->setAssignment(getNewReg()); When Livnees come
+			var->isVariableCorrect();
+			addVariable(var);
 			eat(T_R_ID);
 		}
 		else
@@ -125,6 +140,12 @@ void SyntaxAnalysis::s()
 		eat(T_FUNC);
 		if (m_currentToken.getType() == T_ID)
 		{
+			instruction = new Instruction(I_NO_TYPE, m_instructionCounter++);
+
+			Label* label = new Label(m_currentToken.getValue(), Label::FUNCTION_ID);
+			addLabel(label);
+			instruction->addLabel(label);
+			m_instructions->push_back(instruction);
 			eat(T_ID);
 		}
 		else
@@ -135,6 +156,11 @@ void SyntaxAnalysis::s()
 	}
 	else if (m_currentToken.getType() == T_ID)
 	{
+		instruction = new Instruction(I_NO_TYPE, m_instructionCounter++);
+		Label *label = new Label(m_currentToken.getValue(), Label::ID);
+		addLabel(label);
+		instruction->addLabel(label);
+		m_instructions->push_back(instruction);
 		eat(T_ID);
 		if (m_currentToken.getType() == T_COL)
 		{
@@ -163,7 +189,6 @@ void SyntaxAnalysis::l()
 	if (m_currentToken.getType() == T_END_OF_FILE)
 	{
 		eat(T_END_OF_FILE);
-		//std::cout << "Syntax OK" << std::endl;
 	}
 	else
 	{
@@ -178,23 +203,32 @@ void SyntaxAnalysis::e()
 		return;
 	}
 
+	Instruction* instruction = NULL;
+	Variables srcVariables;
+	Variables destVariables;
+
 	if (m_currentToken.getType() == T_ADD)
 	{
 		eat(T_ADD);
+		instruction = new Instruction(I_ADD, m_instructionCounter++);
 		if (m_currentToken.getType() == T_R_ID)
 		{
+			destVariables.push_back(getVariable(m_currentToken.getValue()));
 			eat(T_R_ID);
 			if (m_currentToken.getType() == T_COMMA)
 			{
+
 				eat(T_COMMA);
 				if (m_currentToken.getType() == T_R_ID)
 				{
+					srcVariables.push_back(getVariable(m_currentToken.getValue()));
 					eat(T_R_ID);
 					if (m_currentToken.getType() == T_COMMA)
 					{
 						eat(T_COMMA);
 						if (m_currentToken.getType() == T_R_ID)
 						{
+							srcVariables.push_back(getVariable(m_currentToken.getValue()));
 							eat(T_R_ID);
 						}
 						else
@@ -225,20 +259,26 @@ void SyntaxAnalysis::e()
 	else if (m_currentToken.getType() == T_ADDI)
 	{
 		eat(T_ADDI);
+		instruction = new Instruction(I_ADDI, m_instructionCounter++);
 		if (m_currentToken.getType() == T_R_ID)
 		{
+			destVariables.push_back(getVariable(m_currentToken.getValue()));
 			eat(T_R_ID);
 			if (m_currentToken.getType() == T_COMMA)
 			{
 				eat(T_COMMA);
 				if (m_currentToken.getType() == T_R_ID)
 				{
+					srcVariables.push_back(getVariable(m_currentToken.getValue()));
 					eat(T_R_ID);
 					if (m_currentToken.getType() == T_COMMA)
 					{
 						eat(T_COMMA);
 						if (m_currentToken.getType() == T_NUM)
 						{
+							Variable *variable = new Variable();
+							variable->setValue(stoi(m_currentToken.getValue()));
+							srcVariables.push_back(variable);
 							eat(T_NUM);
 						}
 						else
@@ -269,20 +309,24 @@ void SyntaxAnalysis::e()
 	else if (m_currentToken.getType() == T_SUB)
 	{
 		eat(T_SUB);
+		instruction = new Instruction(I_SUB,m_instructionCounter++);
 		if (m_currentToken.getType() == T_R_ID)
 		{
+			destVariables.push_back(getVariable(m_currentToken.getValue()));
 			eat(T_R_ID);
 			if (m_currentToken.getType() == T_COMMA)
 			{
 				eat(T_COMMA);
 				if (m_currentToken.getType() == T_R_ID)
 				{
+					srcVariables.push_back(getVariable(m_currentToken.getValue()));
 					eat(T_R_ID);
 					if (m_currentToken.getType() == T_COMMA)
 					{
 						eat(T_COMMA);
 						if (m_currentToken.getType() == T_R_ID)
 						{
+							srcVariables.push_back(getVariable(m_currentToken.getValue()));
 							eat(T_R_ID);
 						}
 						else
@@ -313,14 +357,17 @@ void SyntaxAnalysis::e()
 	else if (m_currentToken.getType() == T_LA)
 	{
 		eat(T_LA);
+		instruction = new Instruction(I_LA, m_instructionCounter++);
 		if (m_currentToken.getType() == T_R_ID)
 		{
+			destVariables.push_back(getVariable(m_currentToken.getValue()));
 			eat(T_R_ID);
 			if (m_currentToken.getType() == T_COMMA)
 			{
 				eat(T_COMMA);
 				if (m_currentToken.getType() == T_M_ID)
 				{
+					srcVariables.push_back(getVariable(m_currentToken.getValue()));
 					eat(T_M_ID);
 				}
 				else
@@ -344,20 +391,26 @@ void SyntaxAnalysis::e()
 	else if (m_currentToken.getType() == T_LW)
 	{
 		eat(T_LW);
+		instruction = new Instruction(I_LW, m_instructionCounter++);
 		if (m_currentToken.getType() == T_R_ID)
 		{
+			destVariables.push_back(getVariable(m_currentToken.getValue()));
 			eat(T_R_ID);
 			if (m_currentToken.getType() == T_COMMA)
 			{
 				eat(T_COMMA);
 				if (m_currentToken.getType() == T_NUM)
 				{
+					Variable* variable = new Variable();
+					variable->setValue(stoi(m_currentToken.getValue()));
+					srcVariables.push_back(variable);
 					eat(T_NUM);
 					if (m_currentToken.getType() == T_L_PARENT)
 					{
 						eat(T_L_PARENT);
 						if (m_currentToken.getType() == T_R_ID)
 						{
+							srcVariables.push_back(getVariable(m_currentToken.getValue()));
 							eat(T_R_ID);
 							if (m_currentToken.getType() == T_R_PARENT)
 							{
@@ -402,14 +455,20 @@ void SyntaxAnalysis::e()
 	else if (m_currentToken.getType() == T_LI)
 	{
 		eat(T_LI);
+		instruction = new Instruction(I_LI, m_instructionCounter++);
+
 		if (m_currentToken.getType() == T_R_ID)
 		{
+			destVariables.push_back(getVariable(m_currentToken.getValue()));
 			eat(T_R_ID);
 			if (m_currentToken.getType() == T_COMMA)
 			{
 				eat(T_COMMA);
 				if (m_currentToken.getType() == T_NUM)
 				{
+					Variable* variable = new Variable();
+					variable->setValue(stoi(m_currentToken.getValue()));
+					srcVariables.push_back(variable);
 					eat(T_NUM);
 				}
 				else
@@ -433,20 +492,26 @@ void SyntaxAnalysis::e()
 	else if (m_currentToken.getType() == T_SW)
 	{
 		eat(T_SW);
+		instruction = new Instruction(I_SW, m_instructionCounter++);
 		if (m_currentToken.getType() == T_R_ID)
 		{
+			destVariables.push_back(getVariable(m_currentToken.getValue()));
 			eat(T_R_ID);
 			if (m_currentToken.getType() == T_COMMA)
 			{
 				eat(T_COMMA);
 				if (m_currentToken.getType() == T_NUM)
 				{
+					Variable* variable = new Variable();
+					variable->setValue(stoi(m_currentToken.getValue()));
+					srcVariables.push_back(variable);
 					eat(T_NUM);
 					if (m_currentToken.getType() == T_L_PARENT)
 					{
 						eat(T_L_PARENT);
 						if (m_currentToken.getType() == T_R_ID)
 						{
+							srcVariables.push_back(getVariable(m_currentToken.getValue()));
 							eat(T_R_ID);
 							if (m_currentToken.getType() == T_R_PARENT)
 							{
@@ -491,8 +556,10 @@ void SyntaxAnalysis::e()
 	else if (m_currentToken.getType() == T_B)
 	{
 		eat(T_B);
+		instruction = new Instruction(I_B, m_instructionCounter++);
 		if (m_currentToken.getType() == T_ID)
 		{
+			instruction->addLabel(getLabel(m_currentToken.getValue()));
 			eat(T_ID);
 		}
 		else
@@ -504,14 +571,17 @@ void SyntaxAnalysis::e()
 	else if (m_currentToken.getType() == T_BLTZ)
 	{
 		eat(T_BLTZ);
+		instruction = new Instruction(I_BLTZ, m_instructionCounter++);
 		if (m_currentToken.getType() == T_R_ID)
 		{
+			srcVariables.push_back(getVariable(m_currentToken.getValue()));
 			eat(T_R_ID);
 			if (m_currentToken.getType() == T_COMMA)
 			{
 				eat(T_COMMA);
 				if (m_currentToken.getType() == T_ID)
 				{
+					instruction->addLabel(getLabel(m_currentToken.getValue()));
 					eat(T_ID);
 				}
 				else
@@ -535,25 +605,30 @@ void SyntaxAnalysis::e()
 	else if (m_currentToken.getType() == T_NOP)
 	{
 		eat(T_NOP);
+		instruction = new Instruction(I_NOP, m_instructionCounter++);
 	}
 	// syntax analysis for newest tokens
 	else if (m_currentToken.getType() == T_REM)
 	{
 		eat(T_REM);
+		instruction = new Instruction(I_REM, m_instructionCounter++);
 		if (m_currentToken.getType() == T_R_ID)
 		{
+			destVariables.push_back(getVariable(m_currentToken.getValue()));
 			eat(T_R_ID);
 			if (m_currentToken.getType() == T_COMMA)
 			{
 				eat(T_COMMA);
 				if (m_currentToken.getType() == T_R_ID)
 				{
+					srcVariables.push_back(getVariable(m_currentToken.getValue()));
 					eat(T_R_ID);
 					if (m_currentToken.getType() == T_COMMA)
 					{
 						eat(T_COMMA);
 						if (m_currentToken.getType() == T_R_ID)
 						{
+							srcVariables.push_back(getVariable(m_currentToken.getValue()));
 							eat(T_R_ID);
 						}
 						else
@@ -584,20 +659,25 @@ void SyntaxAnalysis::e()
 	else if (m_currentToken.getType() == T_SEQ)
 	{
 		eat(T_SEQ);
+		instruction = new Instruction(I_SEQ, m_instructionCounter++);
 		if (m_currentToken.getType() == T_R_ID)
 		{
+			destVariables.push_back(getVariable(m_currentToken.getValue()));
 			eat(T_R_ID);
 			if (m_currentToken.getType() == T_COMMA)
 			{
 				eat(T_COMMA);
 				if (m_currentToken.getType() == T_R_ID)
 				{
+					srcVariables.push_back(getVariable(m_currentToken.getValue()));
 					eat(T_R_ID);
 					if (m_currentToken.getType() == T_COMMA)
 					{
 						eat(T_COMMA);
 						if (m_currentToken.getType() == T_R_ID)
 						{
+							srcVariables.push_back(getVariable(m_currentToken.getValue()));
+
 							eat(T_R_ID);
 						}
 						else
@@ -628,20 +708,24 @@ void SyntaxAnalysis::e()
 	else if (m_currentToken.getType() == T_BEQ)
 	{
 		eat(T_BEQ);
+		instruction = new Instruction(I_BEQ, m_instructionCounter++);
 		if (m_currentToken.getType() == T_R_ID)
 		{
+			destVariables.push_back(getVariable(m_currentToken.getValue()));
 			eat(T_R_ID);
 			if (m_currentToken.getType() == T_COMMA)
 			{
 				eat(T_COMMA);
 				if (m_currentToken.getType() == T_R_ID)
 				{
+					destVariables.push_back(getVariable(m_currentToken.getValue()));
 					eat(T_R_ID);
 					if (m_currentToken.getType() == T_COMMA)
 					{
 						eat(T_COMMA);
 						if (m_currentToken.getType() == T_ID)
 						{
+							instruction->addLabel(getLabel(m_currentToken.getValue()));
 							eat(T_ID);
 						}
 						else
@@ -674,4 +758,106 @@ void SyntaxAnalysis::e()
 		m_syntaxError = true;
 		printSyntaxError(m_currentToken);
 	}
+
+	if (instruction != NULL)
+	{
+		if (srcVariables.empty() == false)
+		{
+			instruction->addSrc(srcVariables);
+		}
+		if (destVariables.empty() == false)
+		{
+			instruction->addDest(destVariables);
+		}
+
+		m_instructions->push_back(instruction);
+		return;
+	}
+}
+
+bool SyntaxAnalysis::variableExists(Variable* var) 
+{
+	if (find(m_memVars->begin(), m_memVars->end(), var) == m_memVars->end() && find(m_regVars->begin(), m_regVars->end(), var) == m_regVars->end())
+	{
+		return false;
+	}
+	throw std::runtime_error("Variable " + var->getName() + "already exists!");
+	return true;
+}
+
+void SyntaxAnalysis::addVariable(Variable* var) 
+{
+	if (variableExists(var) == true) 
+	{
+		return;
+	}
+	else
+	{
+		if (var->getType() == Variable::MEM_VAR)
+		{
+			m_memVars->push_back(var);
+		}
+		else if (var->getType() == Variable::REG_VAR)
+		{
+			var->setPosition(m_variableCounter++);
+			m_regVars->push_back(var);
+		}
+	}
+}
+
+bool SyntaxAnalysis::labelExists(Label* label)
+{
+	if (find(m_labels.begin(), m_labels.end(), label) == m_labels.end())
+	{
+		return false;
+	}
+	throw std::runtime_error("Variable " + label->m_name + "already exists!");
+	return true;
+}
+
+void SyntaxAnalysis::addLabel(Label* label)
+{
+	if (labelExists(label) == true)
+	{
+		return;
+	}
+	else
+	{
+		m_labels.push_back(label);
+	}
+}
+
+Variable* SyntaxAnalysis::getVariable(std::string name)
+{
+	for (Variable* variable : *m_regVars)
+	{
+		if (variable->getName() == name)
+		{
+			return variable;
+		}
+	}
+
+	for (Variable* variable : *m_memVars)
+	{
+		if (variable->getName() == name)
+		{
+			return variable;
+		}
+	}
+
+	throw std::runtime_error("Variable " + name + " not defined.");
+}
+
+Label* SyntaxAnalysis::getLabel(std::string name)
+{
+	for (Label* label : m_labels)
+	{
+		if (label->getName() == name)
+		{
+			return label;
+		}
+	}
+	throw std::runtime_error("Label " + name + " not defined.");
+
+	return NULL;
 }
