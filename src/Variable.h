@@ -24,7 +24,7 @@ public:
 	Variable(std::string name, VariableType type) : m_name(name), m_type(type), m_position(-1), m_assignment(no_assign) {}
 
 	//Constructor for MEM_VAR
-	Variable(std::string name, VariableType type, int value) : m_name(name), m_type(type), m_value(value) {}
+	Variable(std::string name, VariableType type, int value) : m_name(name), m_type(type), m_value(value),m_position(-1), m_assignment(no_assign) {}
 
 private:
 	VariableType m_type;

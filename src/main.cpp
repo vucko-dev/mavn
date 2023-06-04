@@ -7,6 +7,8 @@
 #include "SyntaxAnalysis.h"
 #include "Instruction.h"
 #include "LivenessAnalysis.h"
+#include "InterferenceGraph.h"
+#include "Simplification.h"
 
 using namespace std;
 
@@ -31,6 +33,12 @@ void printVariables(Variables &variables)
 		{
 			cout << variable->getValue();
 		}
+
+		if (variable->getType() == Variable::VariableType::REG_VAR)
+		{
+			cout << variable->getPosition();
+		}
+
 		cout << endl;
 	}
 }
@@ -39,7 +47,7 @@ int main()
 {
 	try
 	{
-		std::string fileName = ".\\..\\examples\\multiply.mavn";
+		std::string fileName = ".\\..\\examples\\simple.mavn";
 		bool retVal = false;
 
 		LexicalAnalysis lex;
@@ -87,8 +95,22 @@ int main()
 
 		livenessAnalysis(&instructions);
 		printInstructions(instructions);
-		printVariables(memoryVariables);
-		printVariables(registerVariables);
+		//printVariables(memoryVariables);
+		//printVariables(registerVariables);
+
+
+		InterferenceGraph interferenceGraph(&instructions, &registerVariables);
+
+		interferenceGraph.doInterferenceGraph();
+		interferenceGraph.printInterferenceGraph();
+		stack<Variable*>* stack = doSimplification(&interferenceGraph, __REG_NUMBER__);
+		if (stack == NULL) {
+			cout << "Error (Spill): It is not posible to do Simplification with just " << __REG_NUMBER__ << " registers" << endl;
+			interferenceGraph.freeInterferenceGraph();
+			return 1;
+		}
+
+		interferenceGraph.freeInterferenceGraph();
 
 
 	}

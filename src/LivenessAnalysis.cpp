@@ -162,7 +162,6 @@ void livenessAnalysis(Instructions* instructions)
 	fillUse(instructions);
 	fillDef(instructions);
 
-	std::list<Instruction*> tempList;
 	for (std::list<Instruction*>::iterator i = instructions->begin(); i != instructions->end(); i++)
 	{
 		(*i)->setIn({});
@@ -175,7 +174,7 @@ void livenessAnalysis(Instructions* instructions)
 	{
 		Instructions instructionsCopy;
 
-		for (std::list<Instruction*>::iterator i = instructions->begin(); i != instructions->end(); i++)
+		for (std::list<Instruction*>::reverse_iterator i = instructions->rbegin(); i != instructions->rend(); i++)
 		{
 			instructionsCopy.push_back(*i);
 			(*i)->setIn({});
@@ -200,11 +199,23 @@ void livenessAnalysis(Instructions* instructions)
 			Variables out = (*i)->getOut();
 			for (std::list<Variable*>::iterator j = out.begin(); j != out.end(); j++)
 			{
-				if (!variableExists((*i)->getDef(),*j) && !variableExists((*i)->getIn(),*j))
+				if (!variableExists((*i)->getDef(),*j) && variableExists((*i)->getOut(),*j))
 				{
 					(*i)->addIn(*j);
 				}
 			}
+
+			std::list<Variable*> tempList = (*i)->getIn();
+			tempList.sort();
+			tempList.unique();
+
+			(*i)->setIn(tempList);
+
+			tempList = (*i)->getOut();
+			tempList.sort();
+			tempList.unique();
+
+			(*i)->setOut(tempList);
 
 		}
 
@@ -212,10 +223,10 @@ void livenessAnalysis(Instructions* instructions)
 
 		bool forEndedWithForce = false;
 		std::list<Instruction*>::iterator i1 = instructions->begin();
-		std::list<Instruction*>::iterator i2 = instructionsCopy.begin();
+		std::list<Instruction*>::reverse_iterator i2 = instructionsCopy.rbegin();
 		for (; i1 != instructions->end(); i1++, i2++) 
 		{
-			if ((*i1)->getIn() != (*i2)->getIn() || (*i2)->getOut() != (*i2)->getOut())
+			if ((*i1)->getIn() != (*i2)->getIn() || (*i1)->getOut() != (*i2)->getOut())
 			{
 				forEndedWithForce = true;
 				break;
@@ -226,6 +237,6 @@ void livenessAnalysis(Instructions* instructions)
 		{
 			livenessEnd = true;
 		}
-
+		
 	}
 }

@@ -79,9 +79,11 @@
     <ClInclude Include="Constants.h" />
     <ClInclude Include="FiniteStateMachine.h" />
     <ClInclude Include="Instruction.h" />
+    <ClInclude Include="InterferenceGraph.h" />
     <ClInclude Include="Label.h" />
     <ClInclude Include="LexicalAnalysis.h" />
     <ClInclude Include="LivenessAnalysis.h" />
+    <ClInclude Include="Simplification.h" />
     <ClInclude Include="SyntaxAnalysis.h" />
     <ClInclude Include="Token.h" />
     <ClInclude Include="Types.h" />
@@ -90,8 +92,10 @@
   <ItemGroup>
     <ClCompile Include="FiniteStateMachine.cpp" />
     <ClCompile Include="Instruction.cpp" />
+    <ClCompile Include="InterferenceGraph.cpp" />
     <ClCompile Include="Label.cpp" />
     <ClCompile Include="LivenessAnalysis.cpp" />
+    <ClCompile Include="Simplification.cpp" />
     <ClCompile Include="Variable.cpp" />
     <ClCompile Include="LexicalAnalysis.cpp" />
     <ClCompile Include="main.cpp" />
