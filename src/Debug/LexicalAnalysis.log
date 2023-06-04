@@ -1,3 +1,16 @@
-﻿  main.cpp
+﻿  FiniteStateMachine.cpp
+  Generating Code...
+  Compiling...
+  main.cpp
+  Variable.cpp
+  Token.cpp
+  SyntaxAnalysis.cpp
+  Simplification.cpp
+  ResourceAllocation.cpp
+  LivenessAnalysis.cpp
+  LexicalAnalysis.cpp
+  InterferenceGraph.cpp
+  Instruction.cpp
+  Generating Code...
   LexicalAnalysis.vcxproj -> C:\Users\David\Desktop\mavn\mavn\src\Debug\LexicalAnalysis.exe
   LexicalAnalysis.vcxproj -> C:\Users\David\Desktop\mavn\mavn\src\Debug\LexicalAnalysis.pdb (Full PDB)

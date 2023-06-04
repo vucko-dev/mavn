@@ -18,11 +18,10 @@ Variable* findVariableByPosition(Variables* variables, int position)
 	return NULL;
 }
 
-std::map<Variable*, int> makeNewNodeMap(InterferenceGraph *ig)
+std::map<Variable*, int> makeNewNodeMap(InterferenceGraph *ig, std::vector<std::vector<int>>& graphValues)
 {
 	std::map<Variable*, int> nodes;
 
-	int** graphValues = ig->getValues();
 	int graphSize = ig->getSize();
 
 	for (int i = 0; i < graphSize; i++)
@@ -69,7 +68,7 @@ std::map<Variable*, int>::iterator findVariable(std::map<Variable*, int>& nodes)
 }
 
 
-bool isSimplificationOver(int** graph, int size)
+bool isSimplificationOver(std::vector<std::vector<int>>& graph, int size)
 {
 	for (int i = 0; i < size; i++)
 	{
@@ -101,7 +100,7 @@ bool isSimplificationPossible(std::map<Variable*, int> nodes, int numberOfRegist
 	return false;
 }
 
-void removeNode(int **graph, int size,int position)
+void removeNode(std::vector<std::vector<int>>& graph, int size, int position)
 {
 	for (int i = 0; i < size; i++)
 	{
@@ -118,12 +117,25 @@ std::stack<Variable*>* doSimplification(InterferenceGraph* ig, int numberOfRegis
 	int **graph = ig->getValues();
 	int size = ig->getSize();
 
+	std::vector<std::vector<int>> graphCopy;
+
+	for (int i = 0; i < size; i++)
+	{
+		std::vector<int> row;
+		for (int j = 0; j < size; j++)
+		{
+			row.push_back(graph[i][j]);
+		}
+		graphCopy.push_back(row);
+	}
+
 	std::vector<bool> pushedNodes(size, false);
 
-	while (isSimplificationOver(graph, size) == false)
+	while (isSimplificationOver(graphCopy, size) == false)
 	{
+
 		//This map represents node(Variable*) and node rank pair
-		std::map<Variable*, int> nodes = makeNewNodeMap(ig);
+		std::map<Variable*, int> nodes = makeNewNodeMap(ig, graphCopy);
 
 		if (nodes.empty() == true)
 		{
@@ -147,7 +159,7 @@ std::stack<Variable*>* doSimplification(InterferenceGraph* ig, int numberOfRegis
 
 		pushedNodes[variableToPush->first->getPosition()] = true;;
 
-		removeNode(graph, size, variableToPush->first->getPosition());
+		removeNode(graphCopy, size, variableToPush->first->getPosition());
 
 	}
 

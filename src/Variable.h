@@ -40,12 +40,14 @@ public:
 	int getPosition() const;
 	int getValue() const;
 	VariableType getType() const;
+	Regs getAssignment() const;
 
 	//Setters for some class atributes
 	void setName(std::string name);
 	void setPosition(int position);
 	void setValue(int value);
 	void setType(Variable::VariableType type);
+	void setAssignment(Regs assignment);
 
 	//Checks is variable name correct;
 	//For example: MEM_VAR should start with m

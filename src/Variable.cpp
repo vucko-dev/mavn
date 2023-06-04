@@ -20,6 +20,11 @@ Variable::VariableType Variable::getType() const
 	return m_type;
 }
 
+Regs Variable::getAssignment() const
+{
+	return m_assignment;
+}
+
 void Variable::setName(std::string name)
 {
 	m_name = name;
@@ -38,6 +43,11 @@ void Variable::setValue(int value)
 void Variable::setType(Variable::VariableType type)
 {
 	m_type = type;
+}
+
+void Variable::setAssignment(Regs assignment)
+{
+	m_assignment = assignment;
 }
 
 void Variable::isVariableCorrect()

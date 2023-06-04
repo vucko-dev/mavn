@@ -9,6 +9,7 @@
 #include "LivenessAnalysis.h"
 #include "InterferenceGraph.h"
 #include "Simplification.h"
+#include "ResourceAllocation.h"
 
 using namespace std;
 
@@ -94,7 +95,7 @@ int main()
 		}
 
 		livenessAnalysis(&instructions);
-		printInstructions(instructions);
+		//printInstructions(instructions);
 		//printVariables(memoryVariables);
 		//printVariables(registerVariables);
 
@@ -102,13 +103,26 @@ int main()
 		InterferenceGraph interferenceGraph(&instructions, &registerVariables);
 
 		interferenceGraph.doInterferenceGraph();
-		interferenceGraph.printInterferenceGraph();
 		stack<Variable*>* stack = doSimplification(&interferenceGraph, __REG_NUMBER__);
 		if (stack == NULL) {
 			cout << "Error (Spill): It is not posible to do Simplification with just " << __REG_NUMBER__ << " registers" << endl;
 			interferenceGraph.freeInterferenceGraph();
 			return 1;
 		}
+
+		interferenceGraph.printInterferenceGraph();
+
+
+		if (doResourceAllocation(stack, &interferenceGraph) == true)
+		{
+
+		}
+		else
+		{
+			cout << "Error during resource allocation!" << endl;
+		}
+
+
 
 		interferenceGraph.freeInterferenceGraph();
 
