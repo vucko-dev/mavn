@@ -28,17 +28,22 @@ void printInstructions(Instructions &instructions)
 
 void printVariables(Variables &variables) 
 {
+
+	cout << "NAME\t\tVALUE\t\tASSIGNMENT\n";
+
 	for (Variable* variable : variables) 
 	{
-		cout << variable->getName() << " ";
+		cout << variable->getName() << "\t\t";
 		if (variable->getType() == Variable::VariableType::MEM_VAR)
 		{
 			cout << variable->getValue();
+			cout << "\t\t-";
 		}
 
 		if (variable->getType() == Variable::VariableType::REG_VAR)
 		{
-			cout << variable->getPosition();
+			cout << "-\t\t";
+			cout << variable->getAssignment();
 		}
 
 		cout << endl;
@@ -48,7 +53,7 @@ void printVariables(Variables &variables)
 
 bool printInFile(string fileName, Instructions& instructions, Variables& variables)
 {
-	ofstream output("simple.s");
+	ofstream output(fileName);
 
 	if (output.is_open() == false)
 	{
@@ -97,12 +102,12 @@ bool printInFile(string fileName, Instructions& instructions, Variables& variabl
 			}
 		}
 		Label* label = x->getLabel();
+		InstructionType type = x->getType();
 
 
 		if (mainFunctionPrinted == true)
 		{
 
-			InstructionType type = x->getType();
 
 			switch (type)
 			{
@@ -168,6 +173,13 @@ bool printInFile(string fileName, Instructions& instructions, Variables& variabl
 				{
 					output << "$t" << destination->getAssignment() << ", ";
 				}
+
+				if (x->getDst().size() > 1)
+				{
+					destination = *(next(x->getDst().begin()));
+					output << "$t" << destination->getAssignment() << ", ";
+				}
+
 			}
 			
 			Variables sources = x->getSrc();
@@ -220,16 +232,19 @@ bool printInFile(string fileName, Instructions& instructions, Variables& variabl
 
 			}
 
-			if (type == InstructionType::I_B || type == InstructionType::I_BLTZ || type == InstructionType::I_BEQ)
-			{
-				if (type != InstructionType::I_B) {
-					output << ", ";
-				}
-				output << x->getLabel()->getName();
-			}
-			output << endl;
+			
 
 		}
+
+		if (type == InstructionType::I_B || type == InstructionType::I_BLTZ || type == InstructionType::I_BEQ)
+		{
+			if (type != InstructionType::I_B && type!= InstructionType::I_BEQ)
+			{
+				output << ", ";
+			}
+			output << x->getLabel()->getName();
+		}
+		output << endl;
 
 
 
@@ -243,7 +258,7 @@ int main()
 {
 	try
 	{
-		std::string fileName = ".\\..\\examples\\multiply.mavn";
+		std::string fileName = ".\\..\\examples\\simple.mavn";
 		bool retVal = false;
 
 		LexicalAnalysis lex;
@@ -258,7 +273,7 @@ int main()
 		if (retVal)
 		{
 			cout << "Lexical analysis finished successfully!" << endl;
-			//lex.printTokens();
+			lex.printTokens();
 		}
 		else
 		{
@@ -269,11 +284,6 @@ int main()
 		cout << setfill('-') << setw(LEFT_ALIGN + RIGHT_ALIGN + 1) << " " << endl;
 		cout << setfill(' ');
 		cout << "Starting syntax analysis . . ." << endl;
-		cout << setw(LEFT_ALIGN) << left << "Type:";
-		cout << setw(RIGHT_ALIGN) << right << "Value:" << endl;
-		cout << setfill('-') << setw(LEFT_ALIGN + RIGHT_ALIGN + 1) << " " << endl;
-		cout << setfill(' ');
-
 		Instructions instructions;
 		Variables memoryVariables, registerVariables;
 		SyntaxAnalysis syntaxAnalysis(lex, &instructions, &memoryVariables, &registerVariables);
@@ -289,30 +299,51 @@ int main()
 			throw runtime_error("\nException! Syntax analysis failed!\n");
 		}
 
-		livenessAnalysis(&instructions);
-		//printInstructions(instructions);
-		//printVariables(memoryVariables);
-		//printVariables(registerVariables);
+		cout << setfill('-') << setw(LEFT_ALIGN + RIGHT_ALIGN + 1) << " " << endl;
+		cout << "Instructions: " << endl;
 
+		livenessAnalysis(&instructions);
+		printInstructions(instructions);
 
 		InterferenceGraph interferenceGraph(&instructions, &registerVariables);
 
 		interferenceGraph.doInterferenceGraph();
 		stack<Variable*>* stack = doSimplification(&interferenceGraph, __REG_NUMBER__);
-		if (stack == NULL) {
+		if (stack == NULL) 
+		{
 			cout << "Error (Spill): It is not posible to do Simplification with just " << __REG_NUMBER__ << " registers" << endl;
 			interferenceGraph.freeInterferenceGraph();
 			return 1;
 		}
 
-		interferenceGraph.printInterferenceGraph();
 
 
 		if (doResourceAllocation(stack, &interferenceGraph) == true)
 		{
 			cout << "Resource allocaton finished successfully!" << endl;
+			cout << setfill('-') << setw(LEFT_ALIGN + RIGHT_ALIGN + 1) << " " << endl;
 
-			printInFile("simple.s", instructions, memoryVariables);
+			cout << "Memory Variables: " << endl;
+			printVariables(memoryVariables);
+			cout << setfill('-') << setw(LEFT_ALIGN + RIGHT_ALIGN + 1) << " " << endl;
+
+			cout << "Register Variables: " << endl;
+			printVariables(registerVariables);
+			cout << setfill('-') << setw(LEFT_ALIGN + RIGHT_ALIGN + 1) << " " << endl;
+
+			cout << "Interference Graph" << endl;
+			interferenceGraph.printInterferenceGraph();
+
+			cout << setfill('-') << setw(LEFT_ALIGN + RIGHT_ALIGN + 1) << " " << endl;
+
+
+			int index = fileName.find(".mavn");
+
+			fileName = fileName.substr(0, index);
+			fileName = fileName + ".s";
+
+
+			printInFile(fileName, instructions, memoryVariables);
 
 		}
 		else

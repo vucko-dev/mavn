@@ -1,7 +1,7 @@
+#include "Token.h"
+
 #include <iostream>
 #include <iomanip>
-
-#include "Token.h"
 #include "FiniteStateMachine.h"
 
 using namespace std;

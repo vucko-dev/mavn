@@ -1,9 +1,9 @@
+#include "LexicalAnalysis.h"
+
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-
 #include "Constants.h"
-#include "LexicalAnalysis.h"
 #include "Token.h"
 
 using namespace std;

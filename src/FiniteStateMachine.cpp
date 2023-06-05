@@ -1,6 +1,6 @@
-#include <sstream>
-
 #include "FiniteStateMachine.h"
+
+#include <sstream>
 
 using namespace std;
 

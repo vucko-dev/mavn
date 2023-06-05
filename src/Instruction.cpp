@@ -1,4 +1,5 @@
 #include "Instruction.h"
+
 void Instruction::addLabel(Label* label)
 {
 	m_label = label;

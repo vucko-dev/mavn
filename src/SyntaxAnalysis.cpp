@@ -1,4 +1,5 @@
 #include "SyntaxAnalysis.h"
+
 #include <iostream>
 #include <algorithm>
 
@@ -7,7 +8,8 @@ SyntaxAnalysis::SyntaxAnalysis(LexicalAnalysis& lexicalAnalysis, Instructions* i
 	m_tokenIterator = m_lexicalAnalysis.getTokenList().begin();
 }
 
-bool SyntaxAnalysis::doSyntaxAnalysis() {
+bool SyntaxAnalysis::doSyntaxAnalysis() 
+{
 	
 	m_currentToken = getNextToken();
 

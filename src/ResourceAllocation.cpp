@@ -9,7 +9,8 @@ bool doResourceAllocation(std::stack<Variable*>* simplificationStack, Interferen
 
 	for (int i = 0; i < __REG_NUMBER__; i++) regs.push_back((Regs)i);
 
-	while (!simplificationStack->empty()) {
+	while (!simplificationStack->empty()) 
+	{
 
 		Variable* temp = simplificationStack->top();
 
