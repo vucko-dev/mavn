@@ -88,6 +88,7 @@ enum Regs
 	t1,
 	t2,
 	t3
+	//Add if necessary
 };
 
 #endif

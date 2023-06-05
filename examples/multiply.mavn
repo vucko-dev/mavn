@@ -22,7 +22,7 @@ lab:
 	add		r6, r6, r2;
 	sub		r7, r5, r4;
 	addi	r5, r5, 1;
-	bltz	r7, lab;
+	b	lab;
 	
 	la		r8, m3;
 	sw		r6, 0(r8);

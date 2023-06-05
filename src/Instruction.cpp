@@ -152,7 +152,7 @@ std::ostream& operator<<(std::ostream& os, const Instruction& i)
 		os << "\t\tbltz";
 		break;
 	case I_B:
-		os << "\t\tadd";
+		os << "\t\tb";
 		break;
 	case I_NOP:
 		os << "\t\tnop";
