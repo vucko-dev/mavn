@@ -1,10 +1,15 @@
+/* Autor: David Vucenovic Datum: 02.06.2023. */
+
+
 #pragma once
 
 #include "LexicalAnalysis.h"
 #include "Token.h"
-#include "Variable.h"
-#include "Instruction.h"
+#include "IR.h"
 #include "Label.h"
+#include "Exceptions.h"
+#include <iostream>
+#include <algorithm>
 
 
 class SyntaxAnalysis 

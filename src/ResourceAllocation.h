@@ -1,3 +1,6 @@
+/* Autor: David Vucenovic Datum: 05.06.2023. */
+
+
 #pragma once
 #ifndef __RESOURCE_ALLOCATION__
 #define __RESOURCE_ALLOCATION__

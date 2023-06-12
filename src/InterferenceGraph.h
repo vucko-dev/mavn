@@ -1,11 +1,12 @@
+/* Autor: David Vucenovic Datum: 04.06.2023. */
+
+
 #pragma once
 #ifndef __INTERFERENCE_GRAPH__
 #define __INTERFERENCE_GRAPH__
 
 #include "Types.h"
-#include "Variable.h"
-#include "Instruction.h"
-
+#include "IR.h"
 
 class InterferenceGraph {
 
@@ -25,9 +26,6 @@ public:
 
 	//This method frees all interference graph resources provided as a parameter 
 	void freeInterferenceGraph();
-
-	//This method prints interference graph
-	void printInterferenceGraph();
 
 	//Getters
 	Instructions* getInstructions() const;

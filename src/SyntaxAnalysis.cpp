@@ -1,7 +1,9 @@
+/* Autor: David Vucenovic Datum: 02.06.2023. */
+
+
+
 #include "SyntaxAnalysis.h"
 
-#include <iostream>
-#include <algorithm>
 
 SyntaxAnalysis::SyntaxAnalysis(LexicalAnalysis& lexicalAnalysis, Instructions* instructions, Variables* memoryVariables, Variables* registerVariables) : m_lexicalAnalysis(lexicalAnalysis), m_instructions(instructions), m_memVars(memoryVariables), m_regVars(registerVariables),  m_syntaxError(false), m_instructionCounter(0), m_variableCounter(0)
 {
@@ -29,7 +31,6 @@ void SyntaxAnalysis::eat(TokenType t)
 {
 	if (m_currentToken.getType() == t)
 	{
-		//m_currentToken.printTokenInfo();
 		if (m_currentToken.getType() == T_END_OF_FILE)
 		{
 			return;
@@ -49,7 +50,7 @@ Token SyntaxAnalysis::getNextToken()
 {
 	if (m_tokenIterator == m_lexicalAnalysis.getTokenList().end())
 	{		
-		throw std::runtime_error("End of input file reached!");
+		throw EndInputReached();
 	}
 
 	return *m_tokenIterator++;
@@ -72,7 +73,7 @@ void SyntaxAnalysis::q()
 	else
 	{
 		m_syntaxError = true;
-		printSyntaxError(m_currentToken);
+		//printSyntaxError(m_currentToken);
 	}
 
 }
@@ -610,10 +611,10 @@ void SyntaxAnalysis::e()
 		instruction = new Instruction(I_NOP, m_instructionCounter++);
 	}
 	// syntax analysis for newest tokens
-	else if (m_currentToken.getType() == T_REM)
+	else if (m_currentToken.getType() == T_OR)
 	{
-		eat(T_REM);
-		instruction = new Instruction(I_REM, m_instructionCounter++);
+		eat(T_OR);
+		instruction = new Instruction(I_OR, m_instructionCounter++);
 		if (m_currentToken.getType() == T_R_ID)
 		{
 			destVariables.push_back(getVariable(m_currentToken.getValue()));
@@ -658,10 +659,10 @@ void SyntaxAnalysis::e()
 			}
 		}
 	}
-	else if (m_currentToken.getType() == T_SEQ)
+	else if (m_currentToken.getType() == T_SGE)
 	{
-		eat(T_SEQ);
-		instruction = new Instruction(I_SEQ, m_instructionCounter++);
+		eat(T_SGE);
+		instruction = new Instruction(I_SGE, m_instructionCounter++);
 		if (m_currentToken.getType() == T_R_ID)
 		{
 			destVariables.push_back(getVariable(m_currentToken.getValue()));
@@ -707,10 +708,10 @@ void SyntaxAnalysis::e()
 			}
 		}
 	}
-	else if (m_currentToken.getType() == T_BEQ)
+	else if (m_currentToken.getType() == T_BNE)
 	{
-		eat(T_BEQ);
-		instruction = new Instruction(I_BEQ, m_instructionCounter++);
+		eat(T_BNE);
+		instruction = new Instruction(I_BNE, m_instructionCounter++);
 		if (m_currentToken.getType() == T_R_ID)
 		{
 			destVariables.push_back(getVariable(m_currentToken.getValue()));
@@ -783,7 +784,7 @@ bool SyntaxAnalysis::variableExists(Variable* var)
 	{
 		return false;
 	}
-	throw std::runtime_error("Variable " + var->getName() + "already exists!");
+	throw VariableExistsError(var->getName());
 	return true;
 }
 
@@ -813,7 +814,7 @@ bool SyntaxAnalysis::labelExists(Label* label)
 	{
 		return false;
 	}
-	throw std::runtime_error("Variable " + label->m_name + "already exists!");
+	throw LabelExistsError(label->getName());
 	return true;
 }
 
@@ -847,7 +848,7 @@ Variable* SyntaxAnalysis::getVariable(std::string name)
 		}
 	}
 
-	throw std::runtime_error("Variable " + name + " not defined.");
+	throw VariableNotDefinedError(name);
 }
 
 Label* SyntaxAnalysis::getLabel(std::string name)
@@ -859,7 +860,7 @@ Label* SyntaxAnalysis::getLabel(std::string name)
 			return label;
 		}
 	}
-	throw std::runtime_error("Label " + name + " not defined.");
+	throw LabelNotDefinedError(name);
 
 	return NULL;
 }

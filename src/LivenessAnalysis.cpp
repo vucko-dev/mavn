@@ -1,7 +1,7 @@
+/* Autor: David Vucenovic Datum: 04.06.2023. */
+
 #pragma once
 #include "LivenessAnalysis.h"
-
-#include <algorithm>
 
 void fillSucc(Instructions* instructions)
 {
@@ -17,18 +17,18 @@ void fillSucc(Instructions* instructions)
 			Instruction* instruction = getLabelInstruction(instructions,label);
 			if (instruction == NULL)
 			{
-				throw std::runtime_error("Error with finding label " + label->getName());
+				throw ErrorWithFindingLabel(label->getName());
 			}
 			(*i)->addSucc(instruction);
 		}
-		else if ((*i)->getType() == I_BLTZ || (*i)->getType() == I_BEQ)
+		else if ((*i)->getType() == I_BLTZ || (*i)->getType() == I_BNE)
 		{
 
 			Label* label = (*i)->getLabel();
 			Instruction* instruction = getLabelInstruction(instructions, label);
 			if (instruction == NULL)
 			{
-				throw std::runtime_error("Error with finding label " + label->getName());
+				throw ErrorWithFindingLabel(label->getName());
 			}
 			(*i)->addSucc(instruction);
 			(*i)->addSucc(*(std::next(i)));
@@ -45,17 +45,17 @@ void fillSucc(Instructions* instructions)
 		Instruction* instruction = getLabelInstruction(instructions, label);
 		if (instruction == NULL)
 		{
-			throw std::runtime_error("Error with finding label " + label->getName());
+			throw ErrorWithFindingLabel(label->getName());
 		}
 		(*last)->addSucc(instruction);
 	}
-	else if ((*last)->getType() == I_BLTZ || (*last)->getType() == I_BEQ)
+	else if ((*last)->getType() == I_BLTZ || (*last)->getType() == I_BNE)
 	{
 		Label* label = (*last)->getLabel();
 		Instruction* instruction = getLabelInstruction(instructions, label);
 		if (instruction == NULL)
 		{
-			throw std::runtime_error("Error with finding label " + label->getName());
+			throw ErrorWithFindingLabel(label->getName());
 		}
 		(*last)->addSucc(instruction);
 	}

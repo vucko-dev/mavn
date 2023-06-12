@@ -1,3 +1,6 @@
+/* Autor: David Vucenovic Datum: 03.06.2023. */
+
+
 #pragma once
 
 #ifndef __LIVENESS_ANALYSIS__
@@ -5,10 +8,10 @@
 
 #include "Types.h"
 #include "Constants.h"
-#include "Instruction.h"
-#include "Variable.h"
+#include "IR.h"
 #include "SyntaxAnalysis.h"
-
+#include <algorithm>
+#include "Exceptions.h"
 
 //Next four functions fills m_pred, m_succ, m_use and m_def lists in instruction
 
@@ -24,7 +27,7 @@ void fillDef(Instructions* instructions);
 Instruction* getLabelInstruction(Instructions* instructions, Label* label);
 
 //Checks existance of Variable& variable in provided list Variables &variables
-bool variableExsists(Variables &variables, Variable &variable);
+bool variableExists(Variables& variables, Variable& variable);
 
 //This function runs Liveness Analysis
 void livenessAnalysis(Instructions* instructions);

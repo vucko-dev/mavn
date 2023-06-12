@@ -1,9 +1,13 @@
+/* Autor: David Vucenovic Datum: 03.06.2023. */
+
+
 #pragma once
 #ifndef __LABEL__
 #define __LABEL__
 
 #include <string>
 #include <list>
+#include "Exceptions.h"
 
 
 //Purpose of this class is just to represent one function name or some label for jump

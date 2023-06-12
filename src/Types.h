@@ -1,3 +1,6 @@
+/* Autor: David Vucenovic Datum: 02.06.2023. */
+
+
 #ifndef __TYPES__
 #define __TYPES__
 
@@ -50,9 +53,9 @@ enum TokenType
 	T_ERROR,
 
 	//newest
-	T_REM,			//rem
-	T_SEQ,			//seq
-	T_BEQ,			//beq
+	T_OR,			//or
+	T_SGE,			//sge
+	T_BNE,			//bne
 };
 
 
@@ -73,9 +76,9 @@ enum InstructionType
 	I_B,
 	I_NOP,
 	//newest
-	I_REM,
-	I_SEQ,
-	I_BEQ,
+	I_OR,
+	I_SGE,
+	I_BNE,
 };
 
 /**
@@ -87,7 +90,7 @@ enum Regs
 	t0,
 	t1,
 	t2,
-	t3
+	t3,
 	//Add if necessary
 };
 

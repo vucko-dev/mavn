@@ -1,3 +1,6 @@
+/* Autor: David Vucenovic Datum: 04.06.2023. */
+
+
 #include "InterferenceGraph.h"
 
 void InterferenceGraph::doInterferenceGraph()
@@ -56,39 +59,6 @@ void InterferenceGraph::doInterferenceGraph()
 			}
 		}
 
-	}
-
-}
-
-void InterferenceGraph::printInterferenceGraph()
-{
-	std::list<Variable*>::iterator i = m_variables->begin();
-
-	std::cout << "    ";
-
-	for (; i != m_variables->end(); i++)
-	{
-		std::cout << (*i)->getName() << " ";
-	}
-
-	std::cout << std::endl;
-
-	int j = 0;
-
-	i = m_variables->begin();
-
-
-	for (; i != m_variables->end(); i++)
-	{
-		std::cout << (*i)->getName() << " ";
-
-		for (int k = 0; k < m_size; k++)
-		{
-			std::cout << " " << m_values[j][k] << " ";
-		}
-
-		std::cout << std::endl;
-		j++;
 	}
 
 }

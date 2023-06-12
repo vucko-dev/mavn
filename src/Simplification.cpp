@@ -1,3 +1,5 @@
+/* Autor: David Vucenovic Datum: 05.06.2023. */
+
 #include "Simplification.h"
 
 

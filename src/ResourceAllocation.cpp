@@ -1,3 +1,6 @@
+/* Autor: David Vucenovic Datum: 05.06.2023. */
+
+
 #include "ResourceAllocation.h"
 
 bool doResourceAllocation(std::stack<Variable*>* simplificationStack, InterferenceGraph* ig)

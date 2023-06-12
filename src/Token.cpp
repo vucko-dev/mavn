@@ -1,3 +1,6 @@
+/* Autor: David Vucenovic Datum: 02.06.2023. */
+
+
 #include "Token.h"
 
 #include <iostream>
@@ -102,9 +105,9 @@ string Token::tokenTypeToString(TokenType t)
 		case T_END_OF_FILE:		return "[T_END_OF_FILE]";
 		case T_ERROR:			return "[T_ERROR]";
 		//cases for newest tokens
-		case T_REM:				return "[T_REM]";
-		case T_SEQ:				return "[T_SEQ]";
-		case T_BEQ:				return "[T_BEQ]";
+		case T_OR:				return "[T_OR]";
+		case T_SGE:				return "[T_SGE]";
+		case T_BNE:				return "[T_BNE]";
 		default:				return "";
 	}
 }

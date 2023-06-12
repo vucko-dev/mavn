@@ -4,10 +4,12 @@
 #include <fstream>
 #include <vector>
 #include <list>
-
 #include "Token.h"
 #include "FiniteStateMachine.h"
-
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include "Constants.h"
 
 typedef std::list<Token> TokenList;
 
